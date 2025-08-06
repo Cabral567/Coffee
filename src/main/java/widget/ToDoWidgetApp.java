@@ -2,11 +2,13 @@ package widget;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
+import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
 import org.fife.ui.autocomplete.*;
@@ -17,15 +19,45 @@ import org.fife.ui.autocomplete.*;
 public class ToDoWidgetApp extends JFrame {
     private JTabbedPane tabbedPane;
     private JFileChooser fileChooser;
+    private JPanel bottomBar;  // Referência para a barra inferior
+    private JSplitPane splitPane; // Divisor entre editor e terminal
+    private JPanel terminalPanel; // Painel do terminal
+    private boolean isTerminalVisible = false; // Estado de visibilidade do terminal
+    
+    // Estiliza um botão da barra de ferramentas
+    private void styleToolbarButton(JButton btn) {
+        btn.setBackground(new Color(240, 240, 240));
+        btn.setForeground(Color.BLACK);
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (btn.isEnabled()) {
+                    btn.setBackground(new Color(220, 220, 220));
+                    btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(140, 140, 140)),
+                        BorderFactory.createEmptyBorder(3,7,3,7)
+                    ));
+                }
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(240, 240, 240));
+                btn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+            }
+        });
+    }
 
     public ToDoWidgetApp() {
-        super("To-Do Widget");
+        super("Coffe");
         // setUndecorated(true); // Removido para exibir barra de navegação
         // setAlwaysOnTop(true); // Removido para exibir barra de navegação
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(300, 400);
+        setSize(800, 600);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(8, 8));
+        setLayout(new BorderLayout());  // Remove padding para ficar mais parecido com Notepad++
 
         // Editor multi-abas com syntax highlighting
         tabbedPane = new JTabbedPane();
@@ -82,6 +114,14 @@ public class ToDoWidgetApp extends JFrame {
         editMenu.add(pasteItem);
         menuBar.add(editMenu);
 
+        JMenu infoMenu = new JMenu("Informações");
+        JMenuItem infoItem = new JMenuItem("Sobre o programa");
+        infoItem.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: Coffe",
+                "Informações", JOptionPane.INFORMATION_MESSAGE));
+        infoMenu.add(infoItem);
+        menuBar.add(infoMenu);
+
         JMenu helpMenu = new JMenu("Ajuda");
         JMenuItem aboutItem = new JMenuItem("Sobre");
         aboutItem.addActionListener(e -> JOptionPane.showMessageDialog(this, "Editor de texto estilo Notepad++\nFeito em Java\nPor Cabral567", "Sobre", JOptionPane.INFORMATION_MESSAGE));
@@ -94,22 +134,24 @@ public class ToDoWidgetApp extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        // Barra de atalhos (sem cor verde)
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
-        topBar.setBackground(Color.white);
-        topBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        // Barra de atalhos estilo Notepad++
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
+        topBar.setBackground(new Color(240, 240, 240));
+        topBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(160, 160, 160)));
 
         JButton newBtn = new JButton("Nova aba");
         newBtn.setToolTipText("Nova aba");
-        newBtn.setBackground(Color.white);
-        newBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        newBtn.setFocusPainted(false);
+        newBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(newBtn);
         newBtn.addActionListener(e -> addNewTab("Novo arquivo", "java"));
         topBar.add(newBtn);
 
-        JButton openBtn = new JButton("Abrir");
+        JButton openBtn = new JButton("Abrir arquivo");
         openBtn.setToolTipText("Abrir arquivo");
-        openBtn.setBackground(Color.white);
-        openBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        openBtn.setFocusPainted(false);
+        openBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(openBtn);
         openBtn.addActionListener(e -> {
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
@@ -126,47 +168,218 @@ public class ToDoWidgetApp extends JFrame {
         topBar.add(openBtn);
 
         JButton saveBtn = new JButton("Salvar");
-        saveBtn.setToolTipText("Salvar aba atual");
-        saveBtn.setBackground(Color.white);
-        saveBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        saveBtn.setToolTipText("Salvar");
+        saveBtn.setFocusPainted(false);
+        saveBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(saveBtn);
         saveBtn.addActionListener(e -> saveCurrentTab());
         topBar.add(saveBtn);
 
         JButton saveAsBtn = new JButton("Salvar como");
-        saveAsBtn.setToolTipText("Salvar aba como...");
-        saveAsBtn.setBackground(Color.white);
-        saveAsBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        saveAsBtn.setToolTipText("Salvar como");
+        saveAsBtn.setFocusPainted(false);
+        saveAsBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(saveAsBtn);
         saveAsBtn.addActionListener(e -> saveCurrentTabAs());
         topBar.add(saveAsBtn);
 
         JButton cutBtn = new JButton("Cortar");
         cutBtn.setToolTipText("Cortar");
-        cutBtn.setBackground(Color.white);
-        cutBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        cutBtn.setFocusPainted(false);
+        cutBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(cutBtn);
         cutBtn.addActionListener(e -> getCurrentTextArea().cut());
         topBar.add(cutBtn);
 
         JButton copyBtn = new JButton("Copiar");
         copyBtn.setToolTipText("Copiar");
-        copyBtn.setBackground(Color.white);
-        copyBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        copyBtn.setFocusPainted(false);
+        copyBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(copyBtn);
         copyBtn.addActionListener(e -> getCurrentTextArea().copy());
         topBar.add(copyBtn);
 
         JButton pasteBtn = new JButton("Colar");
         pasteBtn.setToolTipText("Colar");
-        pasteBtn.setBackground(Color.white);
-        pasteBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        pasteBtn.setFocusPainted(false);
+        pasteBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(pasteBtn);
         pasteBtn.addActionListener(e -> getCurrentTextArea().paste());
         topBar.add(pasteBtn);
 
+        // Botão Terminal
+        JButton terminalBtn = new JButton("Terminal");
+        terminalBtn.setToolTipText("Mostrar/Ocultar Terminal");
+        terminalBtn.setFocusPainted(false);
+        terminalBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(terminalBtn);
+        terminalBtn.addActionListener(e -> toggleTerminal());
+        topBar.add(terminalBtn);
+
+        // Botão Informações
+        JButton infoBtn = new JButton("Informações");
+        infoBtn.setToolTipText("Sobre o programa");
+        infoBtn.setFocusPainted(false);
+        infoBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
+        styleToolbarButton(infoBtn);
+        infoBtn.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: ToDoWidget",
+                "Informações", JOptionPane.INFORMATION_MESSAGE));
+        topBar.add(infoBtn);
+
         mainPanel.add(topBar, BorderLayout.NORTH);
 
-        // Área de edição de texto multi-abas
-        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        // Configuração do terminal
+        terminalPanel = new JPanel(new BorderLayout());
+        terminalPanel.setBackground(new Color(30, 30, 30));
+        
+        // Criar processo do terminal com PowerShell
+        ProcessBuilder processBuilder = new ProcessBuilder(
+            "powershell.exe",
+            "-NoExit",
+            "-Command",
+            "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell';" +
+            "Write-Host 'Windows PowerShell';" +
+            "Write-Host 'Copyright (C) Microsoft Corporation. Todos os direitos reservados.';" +
+            "Write-Host '';" +
+            "function prompt {" +
+            "    $currentPath = $(Get-Location);" +
+            "    'PS ' + $currentPath + '> '" +
+            "}"
+        );
+        processBuilder.redirectErrorStream(true);
+        
+        try {
+            Process process = processBuilder.start();
+            // Terminal com suporte a cores ANSI
+            JTextPane terminalArea = new JTextPane();
+            terminalArea.setBackground(Color.BLACK);
+            terminalArea.setForeground(Color.WHITE);
+            terminalArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+            terminalArea.setCaretColor(Color.WHITE);
+            terminalArea.setEditable(true);
+            
+            // Suporte a cores ANSI
+            terminalArea.setEditorKit(new StyledEditorKit() {
+                @Override
+                public Document createDefaultDocument() {
+                    return new DefaultStyledDocument() {
+                        @Override
+                        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                            if (str.contains("\u001B[")) {
+                                // Processa sequências ANSI
+                                StringBuilder processedText = new StringBuilder();
+                                SimpleAttributeSet attrs = new SimpleAttributeSet();
+                                
+                                for (int i = 0; i < str.length(); i++) {
+                                    if (str.charAt(i) == '\u001B' && i + 1 < str.length() && str.charAt(i + 1) == '[') {
+                                        i += 2;
+                                        StringBuilder code = new StringBuilder();
+                                        while (i < str.length() && str.charAt(i) != 'm') {
+                                            code.append(str.charAt(i++));
+                                        }
+                                        
+                                        // Processa o código ANSI
+                                        String[] codes = code.toString().split(";");
+                                        for (String c : codes) {
+                                            switch (c) {
+                                                case "0": attrs = new SimpleAttributeSet(); break;
+                                                case "30": StyleConstants.setForeground(attrs, Color.BLACK); break;
+                                                case "31": StyleConstants.setForeground(attrs, Color.RED); break;
+                                                case "32": StyleConstants.setForeground(attrs, Color.GREEN); break;
+                                                case "33": StyleConstants.setForeground(attrs, Color.YELLOW); break;
+                                                case "34": StyleConstants.setForeground(attrs, Color.BLUE); break;
+                                                case "35": StyleConstants.setForeground(attrs, Color.MAGENTA); break;
+                                                case "36": StyleConstants.setForeground(attrs, Color.CYAN); break;
+                                                case "37": StyleConstants.setForeground(attrs, Color.WHITE); break;
+                                            }
+                                        }
+                                    } else {
+                                        processedText.append(str.charAt(i));
+                                    }
+                                }
+                                
+                                super.insertString(offs, processedText.toString(), attrs);
+                            } else {
+                                super.insertString(offs, str, a);
+                            }
+                        }
+                    };
+                }
+            });
+            
+            // Redirecionar saída do processo para o JTextArea
+            new Thread(() -> {
+                try {
+                    java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(process.getInputStream())
+                    );
+                    int c;
+                    while ((c = reader.read()) != -1) {
+                        final char ch = (char)c;
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                Document doc = terminalArea.getDocument();
+                                doc.insertString(doc.getLength(), String.valueOf(ch), null);
+                                terminalArea.setCaretPosition(doc.getLength());
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }).start();
+            
+            // Entrada do usuário
+            terminalArea.addKeyListener(new KeyAdapter() {
+                private StringBuilder inputBuffer = new StringBuilder();
+                
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        String command = inputBuffer.toString() + "\n";
+                        try {
+                            process.getOutputStream().write(command.getBytes());
+                            process.getOutputStream().flush();
+                            inputBuffer.setLength(0);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && inputBuffer.length() > 0) {
+                        inputBuffer.setLength(inputBuffer.length() - 1);
+                    } else if (!e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
+                        char c = e.getKeyChar();
+                        if (c != KeyEvent.CHAR_UNDEFINED && !Character.isISOControl(c)) {
+                            inputBuffer.append(c);
+                        }
+                    }
+                }
+            });
+            
+            JScrollPane terminalScroll = new JScrollPane(terminalArea);
+            terminalScroll.setBackground(new Color(1, 36, 86));
+            terminalScroll.setBorder(null);
+            terminalScroll.getViewport().setBackground(new Color(1, 36, 86));
+            terminalPanel.add(terminalScroll, BorderLayout.CENTER);
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JTextArea errorArea = new JTextArea("Erro ao iniciar terminal: " + ex.getMessage());
+            errorArea.setForeground(Color.RED);
+            terminalPanel.add(errorArea, BorderLayout.CENTER);
+        }
+        
+        // Configurar split pane
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabbedPane, terminalPanel);
+        splitPane.setResizeWeight(0.7); // 70% para o editor, 30% para o terminal
+        splitPane.setDividerSize(5);
+        mainPanel.add(splitPane, BorderLayout.CENTER);
+        terminalPanel.setVisible(false);
 
         // Barra inferior para seleção de linguagem
-        JPanel bottomBar = new JPanel(new BorderLayout());
+        bottomBar = new JPanel(new BorderLayout());
         bottomBar.setBackground(Color.white);
         bottomBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
@@ -223,6 +436,15 @@ public class ToDoWidgetApp extends JFrame {
         area.setAntiAliasingEnabled(true);
         area.setFont(new Font("Consolas", Font.PLAIN, 15));
         area.setText(content);
+        
+        // Adiciona atalho Ctrl+S para salvar
+        area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), "save");
+        area.getActionMap().put("save", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveCurrentTab();
+            }
+        });
         RTextScrollPane sp = new RTextScrollPane(area);
         sp.setLineNumbersEnabled(true);
         // Autocomplete básico
@@ -251,12 +473,22 @@ public class ToDoWidgetApp extends JFrame {
         tabPanel.add(closeBtn);
 
         // Zoom de fonte com Ctrl + scroll
+        // Zoom de fonte com Ctrl + scroll
         area.addMouseWheelListener(e -> {
             if (e.isControlDown()) {
                 int notches = e.getWheelRotation();
                 Font f = area.getFont();
                 int newSize = Math.max(8, f.getSize() - notches);
-                area.setFont(f.deriveFont((float)newSize));
+                float newSize_f = (float)newSize;
+                
+                // Atualiza fonte da área de texto
+                area.setFont(f.deriveFont(newSize_f));
+                
+                // Atualiza fonte da numeração de linhas
+                RTextScrollPane scrollPane = (RTextScrollPane)area.getParent().getParent();
+                Font gutterFont = new Font(f.getFamily(), Font.PLAIN, newSize);
+                scrollPane.getGutter().setLineNumberFont(gutterFont);
+                
                 e.consume();
             }
         });
@@ -337,6 +569,15 @@ public class ToDoWidgetApp extends JFrame {
             return filename.substring(idx + 1).toLowerCase();
         }
         return "txt";
+    }
+
+    // Alternar visibilidade do terminal
+    private void toggleTerminal() {
+        isTerminalVisible = !isTerminalVisible;
+        terminalPanel.setVisible(isTerminalVisible);
+        splitPane.setDividerLocation(0.7); // Mantém a proporção ao mostrar/ocultar
+        revalidate();
+        repaint();
     }
 
     // Mapeia extensão para syntax highlighting

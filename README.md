@@ -14,6 +14,9 @@ Editor de texto multi-abas, leve e versátil para Windows, feito em Java 17+ com
 - Fechar abas com X vermelho
 - Visual limpo, moderno e responsivo
 
+- Alternância de tema (claro/escuro) pelo menu "Tema"
+- Menu "Informações" com dados do autor e do programa
+
 ## Como executar
 1. Certifique-se de ter o Java 17+ instalado.
 2. Compile e gere o JAR com dependências:
@@ -28,6 +31,9 @@ Editor de texto multi-abas, leve e versátil para Windows, feito em Java 17+ com
 ## Estrutura do projeto
 - `ToDoWidgetApp.java`: interface principal do editor
 
+Menus principais:
+- Arquivo, Editar, Tema, Informações, Ajuda
+
 ## Dependências
 - [FlatLaf](https://www.formdev.com/flatlaf/)
 - [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)
@@ -35,6 +41,7 @@ Editor de texto multi-abas, leve e versátil para Windows, feito em Java 17+ com
 
 ## Futuras extensões
 - Temas customizáveis
+  (já possui claro/escuro via menu)
 - Busca e substituição
 - Suporte a plugins
 - Mais opções de autocompletar
