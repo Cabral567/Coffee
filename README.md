@@ -2,17 +2,13 @@
 
 Editor de texto multi-abas com terminal integrado, leve e versátil para Windows, feito em Java 17+ com Swing, FlatLaf e RSyntaxTextArea.
 
-[![GitHub Release](https://img.shields.io/github/v/release/Cabral567/Coffee?include_prereleases)](https://github.com/Cabral567/Coffee/releases)
-[![License](https://img.shields.io/github/license/Cabral567/Coffee)](LICENSE)
-
 ## Como usar
 
 ### Execução direta
-1. Baixe o arquivo JAR da [página de releases](https://github.com/Cabral567/Coffee/releases)
-2. Certifique-se de ter o Java 17+ instalado
-3. Execute o comando:
+1. Certifique-se de ter o Java 17+ instalado
+2. Execute o comando:
    ```shell
-   java -jar coffee-1.0-jar-with-dependencies.jar
+   java -jar target/ToDoWidget-1.0-SNAPSHOT-jar-with-dependencies.jar
    ```
 
 ### Build a partir do código fonte
@@ -27,7 +23,7 @@ Editor de texto multi-abas com terminal integrado, leve e versátil para Windows
    ```
 3. Execute o programa:
    ```shell
-   java -jar target/coffee-1.0-jar-with-dependencies.jar
+   java -jar target/ToDoWidget-1.0-SNAPSHOT-jar-with-dependencies.jar
    ```
 
 ## Principais Funcionalidades
