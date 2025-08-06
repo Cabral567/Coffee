@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>target/coffee-1.0-jar-with-dependencies.jar</jar>
+  <outfile>Coffee.exe</outfile>
+  <errTitle>Coffee Editor</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://adoptium.net/</downloadUrl>
+  <supportUrl>https://github.com/Cabral567/Coffee</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>src/main/resources/coffee.ico</icon>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>17.0.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.0</txtFileVersion>
+    <fileDescription>Coffee Editor - Editor de texto avançado</fileDescription>
+    <copyright>Cabral567</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.0</txtProductVersion>
+    <productName>Coffee Editor</productName>
+    <companyName></companyName>
+    <internalName>coffee</internalName>
+    <originalFilename>Coffee.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>PORTUGUESE_BRAZIL</language>
+  </versionInfo>
+</launch4jConfig>

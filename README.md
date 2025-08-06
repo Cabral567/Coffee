@@ -1,6 +1,30 @@
-# Coffee - Editor de Texto Avançado
+# Coffee Editor
 
 Editor de texto multi-abas com terminal integrado, leve e versátil para Windows, feito em Java 17+ com Swing, FlatLaf e RSyntaxTextArea.
+
+[![GitHub Release](https://img.shields.io/github/v/release/Cabral567/Coffee?include_prereleases)](https://github.com/Cabral567/Coffee/releases)
+[![License](https://img.shields.io/github/license/Cabral567/Coffee)](LICENSE)
+
+## Download e Instalação
+
+### Instalador Windows
+1. Baixe o instalador mais recente `CoffeeSetup.exe` da [página de releases](https://github.com/Cabral567/Coffee/releases)
+2. Execute o instalador e siga as instruções
+3. Após a instalação, o Coffee estará disponível no Menu Iniciar e opcionalmente na Área de Trabalho
+4. O programa já vem com Java embutido, não é necessário instalar o Java separadamente
+
+### Build Manual
+1. Certifique-se de ter o Java 17+ instalado
+2. Clone o repositório:
+   ```shell
+   git clone https://github.com/Cabral567/Coffee.git
+   cd Coffee
+   ```
+3. Compile e gere o JAR com dependências:
+   ```shell
+   mvn clean package
+   ```
+4. O JAR será gerado em `target/coffee-1.0-jar-with-dependencies.jar`
 
 ## Principais Funcionalidades
 - Múltiplas abas (multi-tab)
@@ -26,16 +50,31 @@ Editor de texto multi-abas com terminal integrado, leve e versátil para Windows
 - Visual limpo, moderno e responsivo
 - Menu "Informações" com dados do projeto
 
-## Como executar
-1. Certifique-se de ter o Java 17+ instalado
-2. Compile e gere o JAR com dependências:
+## Desenvolvimento
+
+### Requisitos
+- Java Development Kit (JDK) 17 ou superior
+- Maven
+- Launch4j (para gerar .exe)
+- Inno Setup (para criar o instalador)
+
+### Gerando o Executável
+1. Primeiro, gere o JAR com dependências:
    ```shell
    mvn clean package
    ```
-3. Execute o aplicativo:
-   ```shell
-   java -jar target/coffee-1.0-jar-with-dependencies.jar
-   ```
+
+2. Use o Launch4j para criar o executável:
+   - Configure o caminho do JAR de entrada: `target/coffee-1.0-jar-with-dependencies.jar`
+   - Configure o arquivo de saída: `Coffee.exe`
+   - Defina a versão mínima do Java como 17
+   - Configure o ícone e informações do programa
+
+3. Use o Inno Setup para criar o instalador:
+   - Crie um novo script usando o assistente
+   - Inclua o `Coffee.exe` e as dependências
+   - Configure informações do programa, ícones e atalhos
+   - Compile para gerar `CoffeeSetup.exe`
 
 ## Interface do Usuário
 - Barra de menus:
