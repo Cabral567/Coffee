@@ -611,7 +611,7 @@ public class ToDoWidgetApp extends JFrame {
     }
 
     // Detecta extensão para linguagem
-    private String getExtension(String filename) {
+    public String getExtension(String filename) {
         int idx = filename.lastIndexOf('.');
         if (idx > 0 && idx < filename.length() - 1) {
             return filename.substring(idx + 1).toLowerCase();
@@ -629,7 +629,7 @@ public class ToDoWidgetApp extends JFrame {
     }
 
     // Mapeia extensão OU nome da linguagem para syntax highlighting
-    private String getSyntaxStyle(String input) {
+    public String getSyntaxStyle(String input) {
         String normalized = input.toLowerCase();
         switch (normalized) {
             // Por extensão de arquivo
@@ -668,6 +668,37 @@ public class ToDoWidgetApp extends JFrame {
         try { FlatLightLaf.install(); } catch (Exception ignored) {}
         SwingUtilities.invokeLater(() -> {
             ToDoWidgetApp app = new ToDoWidgetApp();
+            
+            // Se foi passado um arquivo como argumento (abrir com)
+            if (args.length > 0) {
+                String filePath = args[0];
+                File file = new File(filePath);
+                if (file.exists() && file.isFile()) {
+                    try {
+                        String content = new String(java.nio.file.Files.readAllBytes(file.toPath()), 
+                                                  java.nio.charset.StandardCharsets.UTF_8);
+                        String ext = app.getExtension(file.getName());
+                        String syntax = app.getSyntaxStyle(ext);
+                        
+                        // Remove a aba padrão "Novo arquivo" se estiver vazia
+                        if (app.tabbedPane.getTabCount() == 1) {
+                            RSyntaxTextArea defaultArea = app.getCurrentTextArea();
+                            if (defaultArea.getText().trim().isEmpty()) {
+                                app.tabbedPane.removeTabAt(0);
+                            }
+                        }
+                        
+                        // Adiciona nova aba com o arquivo
+                        app.addNewTab(file.getName(), syntax, content);
+                    } catch (Exception ex) {
+                        // Se houver erro ao ler arquivo, mostra mensagem mas ainda abre o editor
+                        JOptionPane.showMessageDialog(app, 
+                            "Erro ao abrir arquivo: " + ex.getMessage(), 
+                            "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+            
             app.setVisible(true);
         });
     }
