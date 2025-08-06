@@ -1,0 +1,14 @@
+# Maven
+/target/
+
+# IDEs
+/.idea/
+*.iml
+*.class
+
+# Sistema
+.DS_Store
+*.log
+
+# Arquivo de tarefas local
+.todo_widget_tasks.json
