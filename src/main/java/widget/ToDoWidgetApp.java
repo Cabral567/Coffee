@@ -30,11 +30,26 @@ public class ToDoWidgetApp extends JFrame {
         listModel = new DefaultListModel<>();
         tasks.forEach(listModel::addElement);
 
-        // Campo de entrada
+        // Barra superior estilo Notepad++
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setBackground(new Color(170, 220, 120)); // verde claro
+        topBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+
         inputField = new JTextField();
         inputField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        inputField.setBorder(BorderFactory.createLineBorder(new Color(200,200,200), 1));
         inputField.addActionListener(e -> addTask());
-        add(inputField, BorderLayout.NORTH);
+        topBar.add(inputField, BorderLayout.CENTER);
+
+        // Botão de adicionar com ícone
+        JButton addBtn = new JButton(new ImageIcon("src/main/resources/add.png"));
+        addBtn.setToolTipText("Adicionar tarefa");
+        addBtn.setBackground(new Color(170, 220, 120));
+        addBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        addBtn.addActionListener(e -> addTask());
+        topBar.add(addBtn, BorderLayout.EAST);
+
+        add(topBar, BorderLayout.NORTH);
 
         // Lista de tarefas
         taskList = new JList<>(listModel);
