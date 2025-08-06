@@ -1,14 +1,18 @@
-# To-Do Widget
+# ToDoWidget - Editor de Texto Avançado
 
-Mini aplicativo de lista de tarefas para Windows, feito em Java 17+ com Swing e FlatLaf.
+Editor de texto multi-abas, leve e versátil para Windows, feito em Java 17+ com Swing, FlatLaf e RSyntaxTextArea.
 
-## Funcionalidades
-- Adicionar tarefas
-- Marcar tarefas como concluídas
-- Persistência automática em JSON
-- Sempre visível (always on top)
-- Janela pequena, sem bordas
-- Design limpo e moderno
+## Principais Funcionalidades
+- Múltiplas abas (multi-tab)
+- Destaque de sintaxe para várias linguagens (Java, Python, C, C++, HTML, JS, XML, texto)
+- Autocompletar básico por linguagem
+- Numeração de linhas
+- Zoom de fonte com Ctrl + scroll do mouse
+- Seleção de linguagem por aba (barra inferior)
+- Atalhos de edição (cortar, copiar, colar)
+- Salvar, abrir e criar arquivos facilmente
+- Fechar abas com X vermelho
+- Visual limpo, moderno e responsivo
 
 ## Como executar
 1. Certifique-se de ter o Java 17+ instalado.
@@ -22,15 +26,15 @@ Mini aplicativo de lista de tarefas para Windows, feito em Java 17+ com Swing e 
    ```
 
 ## Estrutura do projeto
-- `Task.java`: modelo de tarefa
-- `TaskPersistence.java`: persistência em JSON
-- `ToDoWidgetApp.java`: interface principal
+- `ToDoWidgetApp.java`: interface principal do editor
 
 ## Dependências
-- [Jackson](https://github.com/FasterXML/jackson)
 - [FlatLaf](https://www.formdev.com/flatlaf/)
+- [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)
+- [AutoComplete](https://github.com/bobbylight/AutoComplete)
 
 ## Futuras extensões
-- Teclas de atalho (DEL para apagar)
-- Ícone de bandeja
-- Sincronização com Google Tasks
+- Temas customizáveis
+- Busca e substituição
+- Suporte a plugins
+- Mais opções de autocompletar
