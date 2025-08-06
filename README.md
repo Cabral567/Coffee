@@ -1,5 +1,15 @@
 # Coffee Editor
 
+```
+   ___      __  __           ___    _ _ _             
+  / __\___ / _|/ _| ___  ___ / __\__| (_) |_ ___  _ __ 
+ / /  / _ \| |_| |_ / _ \/ _ / /__/ _` | | __/ _ \| '__|
+/ /__| (_) |  _|  _|  __/  __\___| (_| | | || (_) | |   
+\____/\___/|_| |_|  \___|\___|   \__,_|_|\__\___/|_|   
+
+      Super Leve • Ultrarrápido • Minimalista
+```
+
 **Editor de Texto Super Leve e Rápido** - Interface minimalista, performance otimizada e recursos essenciais para programadores.
 
 Editor multi-abas ultrarrápido com terminal integrado, desenvolvido para ser o mais leve e eficiente possível, sem sacrificar funcionalidades importantes. Feito em Java 17+ com Swing, FlatLaf e RSyntaxTextArea.
@@ -52,6 +62,7 @@ Editor multi-abas ultrarrápido com terminal integrado, desenvolvido para ser o 
 - **Operações de arquivo rápidas** (salvar, abrir, criar)
 - **Fechar abas** com botão X intuitivo
 - **Visual moderno e responsivo** - Interface limpa e profissional
+
 ## Por que escolher o Coffee?
 
 **Coffee foi desenvolvido com foco em PERFORMANCE e LEVEZA**, oferecendo:
@@ -64,26 +75,65 @@ Editor multi-abas ultrarrápido com terminal integrado, desenvolvido para ser o 
 
 *Ideal para quem busca um editor rápido, leve e funcional para programação diária.*
 
-## Como usar
+## Instalação
 
-## Desenvolvimento
+### Windows - Instalador Automático (Recomendado)
+1. Baixe o arquivo `setup.exe` da seção de releases
+2. Execute o instalador como administrador
+3. Siga as instruções do assistente de instalação
+4. O Coffee será instalado e configurado automaticamente
+5. Ícone será criado na área de trabalho e menu iniciar
+6. **Funcionalidade "Abrir com"** será configurada automaticamente
 
-### Requisitos
+### Execução Manual (JAR)
+**Pré-requisito:** Java 17+ instalado no sistema
+```shell
+java -jar Coffee-1.0.jar
+```
+
+**Para usar "abrir com" manualmente:**
+```shell
+java -jar Coffee-1.0.jar "caminho/para/arquivo.txt"
+```
+
+### Recursos do Instalador Windows
+O instalador `setup.exe` configura automaticamente:
+- **Associação de arquivos** - Coffee como opção "Abrir com" para arquivos de código
+- **Variáveis de ambiente** - PATH configurado para execução global
+- **Ícones do sistema** - Área de trabalho e menu iniciar
+- **Desinstalador** - Remoção limpa através do Painel de Controle
+- **Auto-atualização** - Verificação automática de novas versões
+
+## Build a partir do código fonte
+
+### Requisitos para desenvolvimento
 - Java Development Kit (JDK) 17 ou superior
-- Maven
+- Maven 3.6+
+- Git
+
+### Passos para compilar
+1. Clone o repositório:
+   ```shell
+   git clone https://github.com/Cabral567/Coffee.git
+   cd Coffee
+   ```
+2. Compile o projeto:
+   ```shell
+   mvn clean compile
+   ```
+3. Gere o JAR executável:
+   ```shell
+   mvn clean package
+   ```
+4. Execute a partir do código:
+   ```shell
+   mvn exec:java -Dexec.mainClass="widget.ToDoWidgetApp"
+   ```
 
 ### Estrutura do projeto
 - `src/main/java/widget/ToDoWidgetApp.java`: Classe principal do editor
-
-### Compilação
-```shell
-mvn clean compile
-```
-
-### Execução em modo de desenvolvimento
-```shell
-mvn exec:java -Dexec.mainClass="widget.ToDoWidgetApp"
-```
+- `pom.xml`: Configuração Maven com dependências
+- `README.md`: Documentação do projeto
 
 ## Interface do Usuário
 - Barra de menus:
@@ -107,7 +157,13 @@ mvn exec:java -Dexec.mainClass="widget.ToDoWidgetApp"
 - **[AutoComplete](https://github.com/bobbylight/AutoComplete)** - Autocompletar eficiente
 
 ## Autor
-**Cabral567** - *Desenvolvedor focado em criar ferramentas leves e eficientes*
+<div align="center">
+  <img src="./assets/profile.png" alt="Cabral567" width="150" style="border-radius: 50%;">
+  <br>
+  <strong>Cabral567</strong>
+  <br>
+  <em>Desenvolvedor focado em criar ferramentas leves e eficientes</em>
+</div>
 
 ## Versão
 **1.0** - *Editor Super Leve e Rápido*
