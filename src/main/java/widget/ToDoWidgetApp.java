@@ -67,7 +67,11 @@ public class ToDoWidgetApp extends JFrame {
 
         setJMenuBar(menuBar);
 
-        // Barra superior com botões
+        // Painel principal para layout vertical
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+
+        // Barra verde com botões
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(170, 220, 120));
         topBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
@@ -109,7 +113,7 @@ public class ToDoWidgetApp extends JFrame {
         btnPanel.add(saveBtn);
 
         topBar.add(btnPanel, BorderLayout.EAST);
-        add(topBar, BorderLayout.NORTH);
+        mainPanel.add(topBar, BorderLayout.NORTH);
 
         // Lista de tarefas
         taskList = new JList<>(listModel);
@@ -128,11 +132,12 @@ public class ToDoWidgetApp extends JFrame {
             }
         });
         JScrollPane scroll = new JScrollPane(taskList);
-        add(scroll, BorderLayout.CENTER);
+        mainPanel.add(scroll, BorderLayout.CENTER);
 
         // Sombra e cor de fundo
         getRootPane().setBorder(BorderFactory.createLineBorder(new Color(180,180,180), 1));
-        getContentPane().setBackground(Color.white);
+        mainPanel.setBackground(Color.white);
+        setContentPane(mainPanel);
     }
 
     private void addTask() {
