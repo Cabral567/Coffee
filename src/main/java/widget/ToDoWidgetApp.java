@@ -117,8 +117,22 @@ public class ToDoWidgetApp extends JFrame {
         JMenu infoMenu = new JMenu("Informações");
         JMenuItem infoItem = new JMenuItem("Sobre o programa");
         infoItem.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: Coffee",
-                "Informações", JOptionPane.INFORMATION_MESSAGE));
+                "Coffee - Editor de Texto Super Leve e Rápido\n\n" +
+                "CARACTERÍSTICAS PRINCIPAIS:\n" +
+                "• Editor ultrarrápido e responsivo\n" +
+                "• Interface minimalista e eficiente\n" +
+                "• Baixo consumo de memória e CPU\n\n" +
+                "RECURSOS:\n" +
+                "• Syntax highlighting para 8+ linguagens\n" +
+                "• Sistema de abas multi-documento\n" +
+                "• Autocompletar inteligente\n" +
+                "• Zoom dinâmico (Ctrl + Scroll)\n" +
+                "• Terminal PowerShell integrado\n" +
+                "• Detecção automática de linguagem\n\n" +
+                "Desenvolvido para ser o editor mais leve e ágil,\n" +
+                "sem sacrificar funcionalidades essenciais.\n\n" +
+                "Autor: Cabral567 | Versão: 1.0 | Java 17+",
+                "Coffee - Editor Super Leve", JOptionPane.INFORMATION_MESSAGE));
         infoMenu.add(infoItem);
         menuBar.add(infoMenu);
 
@@ -223,151 +237,170 @@ public class ToDoWidgetApp extends JFrame {
         infoBtn.setBorder(BorderFactory.createEmptyBorder(4,8,4,8));
         styleToolbarButton(infoBtn);
         infoBtn.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: ToDoWidget",
-                "Informações", JOptionPane.INFORMATION_MESSAGE));
+                "Coffee - Editor de Texto Super Leve e Rápido\n\n" +
+                "CARACTERÍSTICAS PRINCIPAIS:\n" +
+                "• Editor ultrarrápido e responsivo\n" +
+                "• Interface minimalista e eficiente\n" +
+                "• Baixo consumo de memória e CPU\n\n" +
+                "RECURSOS:\n" +
+                "• Syntax highlighting para 8+ linguagens\n" +
+                "• Sistema de abas multi-documento\n" +
+                "• Autocompletar inteligente\n" +
+                "• Zoom dinâmico (Ctrl + Scroll)\n" +
+                "• Terminal PowerShell integrado\n" +
+                "• Detecção automática de linguagem\n\n" +
+                "Desenvolvido para ser o editor mais leve e ágil,\n" +
+                "sem sacrificar funcionalidades essenciais.\n\n" +
+                "Autor: Cabral567 | Versão: 1.0 | Java 17+",
+                "Coffee - Editor Super Leve", JOptionPane.INFORMATION_MESSAGE));
         topBar.add(infoBtn);
 
         mainPanel.add(topBar, BorderLayout.NORTH);
 
-        // Configuração do terminal
+        // Configuração do terminal seguindo melhores práticas da documentação Java
         terminalPanel = new JPanel(new BorderLayout());
         terminalPanel.setBackground(new Color(30, 30, 30));
         
-        // Criar processo do terminal com PowerShell
-        ProcessBuilder processBuilder = new ProcessBuilder(
-            "powershell.exe",
-            "-NoExit",
-            "-Command",
-            "$Host.UI.RawUI.WindowTitle = 'Windows PowerShell';" +
-            "Write-Host 'Windows PowerShell';" +
-            "Write-Host 'Copyright (C) Microsoft Corporation. Todos os direitos reservados.';" +
-            "Write-Host '';" +
-            "function prompt {" +
-            "    $currentPath = $(Get-Location);" +
-            "    'PS ' + $currentPath + '> '" +
-            "}"
-        );
-        processBuilder.redirectErrorStream(true);
-        
         try {
+            // Configurar ProcessBuilder seguindo a documentação oficial
+            ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe", "-NoExit");
+            processBuilder.redirectErrorStream(true); // Merge stderr com stdout
+            processBuilder.directory(new File(System.getProperty("user.dir"))); // Working directory
+            
+            // Configurar environment se necessário
+            processBuilder.environment().put("TERM", "dumb"); // Terminal simples
+            
             Process process = processBuilder.start();
-            // Terminal com suporte a cores ANSI
-            JTextPane terminalArea = new JTextPane();
+            
+            // Terminal display com JTextArea otimizado
+            JTextArea terminalArea = new JTextArea(20, 80);
             terminalArea.setBackground(Color.BLACK);
             terminalArea.setForeground(Color.WHITE);
             terminalArea.setFont(new Font("Consolas", Font.PLAIN, 14));
             terminalArea.setCaretColor(Color.WHITE);
-            terminalArea.setEditable(true);
+            terminalArea.setEditable(false);
+            terminalArea.setLineWrap(true);
+            terminalArea.setWrapStyleWord(true);
             
-            // Suporte a cores ANSI
-            terminalArea.setEditorKit(new StyledEditorKit() {
-                @Override
-                public Document createDefaultDocument() {
-                    return new DefaultStyledDocument() {
-                        @Override
-                        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-                            if (str.contains("\u001B[")) {
-                                // Processa sequências ANSI
-                                StringBuilder processedText = new StringBuilder();
-                                SimpleAttributeSet attrs = new SimpleAttributeSet();
-                                
-                                for (int i = 0; i < str.length(); i++) {
-                                    if (str.charAt(i) == '\u001B' && i + 1 < str.length() && str.charAt(i + 1) == '[') {
-                                        i += 2;
-                                        StringBuilder code = new StringBuilder();
-                                        while (i < str.length() && str.charAt(i) != 'm') {
-                                            code.append(str.charAt(i++));
-                                        }
-                                        
-                                        // Processa o código ANSI
-                                        String[] codes = code.toString().split(";");
-                                        for (String c : codes) {
-                                            switch (c) {
-                                                case "0": attrs = new SimpleAttributeSet(); break;
-                                                case "30": StyleConstants.setForeground(attrs, Color.BLACK); break;
-                                                case "31": StyleConstants.setForeground(attrs, Color.RED); break;
-                                                case "32": StyleConstants.setForeground(attrs, Color.GREEN); break;
-                                                case "33": StyleConstants.setForeground(attrs, Color.YELLOW); break;
-                                                case "34": StyleConstants.setForeground(attrs, Color.BLUE); break;
-                                                case "35": StyleConstants.setForeground(attrs, Color.MAGENTA); break;
-                                                case "36": StyleConstants.setForeground(attrs, Color.CYAN); break;
-                                                case "37": StyleConstants.setForeground(attrs, Color.WHITE); break;
-                                            }
-                                        }
-                                    } else {
-                                        processedText.append(str.charAt(i));
-                                    }
-                                }
-                                
-                                super.insertString(offs, processedText.toString(), attrs);
-                            } else {
-                                super.insertString(offs, str, a);
-                            }
-                        }
-                    };
-                }
-            });
+            // Stream readers seguindo melhores práticas de I/O
+            java.io.BufferedReader outputReader = new java.io.BufferedReader(
+                new java.io.InputStreamReader(process.getInputStream(), 
+                java.nio.charset.StandardCharsets.UTF_8)
+            );
+            java.io.BufferedWriter inputWriter = new java.io.BufferedWriter(
+                new java.io.OutputStreamWriter(process.getOutputStream(), 
+                java.nio.charset.StandardCharsets.UTF_8)
+            );
             
-            // Redirecionar saída do processo para o JTextArea
-            new Thread(() -> {
+            // Controle de auto-scroll melhorado
+            final boolean[] autoScroll = {true};
+            
+            // Thread para ler output do processo (seguindo pattern de documentação)
+            Thread outputThread = new Thread(() -> {
                 try {
-                    java.io.BufferedReader reader = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(process.getInputStream())
-                    );
-                    int c;
-                    while ((c = reader.read()) != -1) {
-                        final char ch = (char)c;
+                    String line;
+                    while ((line = outputReader.readLine()) != null) {
+                        final String finalLine = line + "\n";
                         SwingUtilities.invokeLater(() -> {
-                            try {
-                                Document doc = terminalArea.getDocument();
-                                doc.insertString(doc.getLength(), String.valueOf(ch), null);
-                                terminalArea.setCaretPosition(doc.getLength());
-                            } catch (BadLocationException ex) {
-                                ex.printStackTrace();
+                            terminalArea.append(finalLine);
+                            
+                            // Limitar tamanho do buffer para performance
+                            if (terminalArea.getDocument().getLength() > 50000) {
+                                try {
+                                    terminalArea.getDocument().remove(0, 10000);
+                                } catch (Exception ignored) {}
+                            }
+                            
+                            // Auto-scroll inteligente
+                            if (autoScroll[0]) {
+                                terminalArea.setCaretPosition(terminalArea.getDocument().getLength());
                             }
                         });
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (java.io.IOException ex) {
+                    SwingUtilities.invokeLater(() -> {
+                        terminalArea.append("Terminal desconectado: " + ex.getMessage() + "\n");
+                    });
                 }
-            }).start();
+            });
+            outputThread.setDaemon(true);
+            outputThread.start();
             
-            // Entrada do usuário
-            terminalArea.addKeyListener(new KeyAdapter() {
-                private StringBuilder inputBuffer = new StringBuilder();
-                
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        String command = inputBuffer.toString() + "\n";
-                        try {
-                            process.getOutputStream().write(command.getBytes());
-                            process.getOutputStream().flush();
-                            inputBuffer.setLength(0);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && inputBuffer.length() > 0) {
-                        inputBuffer.setLength(inputBuffer.length() - 1);
-                    } else if (!e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
-                        char c = e.getKeyChar();
-                        if (c != KeyEvent.CHAR_UNDEFINED && !Character.isISOControl(c)) {
-                            inputBuffer.append(c);
-                        }
+            // Campo de entrada otimizado
+            JTextField inputField = new JTextField();
+            inputField.setBackground(Color.BLACK);
+            inputField.setForeground(Color.WHITE);
+            inputField.setCaretColor(Color.WHITE);
+            inputField.setFont(new Font("Consolas", Font.PLAIN, 14));
+            inputField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            ));
+            
+            // Action listener para enviar comandos
+            inputField.addActionListener(e -> {
+                String command = inputField.getText();
+                if (!command.trim().isEmpty()) {
+                    try {
+                        inputWriter.write(command + "\r\n");
+                        inputWriter.flush();
+                        inputField.setText("");
+                    } catch (java.io.IOException ex) {
+                        SwingUtilities.invokeLater(() -> {
+                            terminalArea.append("Erro ao enviar comando: " + ex.getMessage() + "\n");
+                        });
                     }
                 }
             });
             
+            // ScrollPane com configurações otimizadas
             JScrollPane terminalScroll = new JScrollPane(terminalArea);
-            terminalScroll.setBackground(new Color(1, 36, 86));
-            terminalScroll.setBorder(null);
-            terminalScroll.getViewport().setBackground(new Color(1, 36, 86));
-            terminalPanel.add(terminalScroll, BorderLayout.CENTER);
+            terminalScroll.setBackground(Color.BLACK);
+            terminalScroll.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            terminalScroll.getViewport().setBackground(Color.BLACK);
+            
+            // Configurações de scroll seguindo melhores práticas
+            terminalScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            terminalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            terminalScroll.getVerticalScrollBar().setUnitIncrement(16);
+            terminalScroll.getHorizontalScrollBar().setUnitIncrement(16);
+            
+            // Caret policy otimizada
+            DefaultCaret caret = (DefaultCaret) terminalArea.getCaret();
+            caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+            
+            // Detector de scroll manual melhorado
+            terminalScroll.getVerticalScrollBar().addAdjustmentListener(e -> {
+                if (!e.getValueIsAdjusting()) {
+                    JScrollBar scrollBar = terminalScroll.getVerticalScrollBar();
+                    int extent = scrollBar.getModel().getExtent();
+                    int maximum = scrollBar.getMaximum();
+                    int value = scrollBar.getValue();
+                    autoScroll[0] = (value + extent) >= (maximum - 50); // Margem de 50px
+                }
+            });
+            
+            // Container do terminal
+            JPanel terminalContainer = new JPanel(new BorderLayout());
+            terminalContainer.add(terminalScroll, BorderLayout.CENTER);
+            terminalContainer.add(inputField, BorderLayout.SOUTH);
+            
+            terminalPanel.add(terminalContainer, BorderLayout.CENTER);
+            
+            // Cleanup quando a janela fechar
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    inputWriter.close();
+                    outputReader.close();
+                    process.destroyForcibly();
+                } catch (Exception ignored) {}
+            }));
             
         } catch (Exception ex) {
             ex.printStackTrace();
             JTextArea errorArea = new JTextArea("Erro ao iniciar terminal: " + ex.getMessage());
             errorArea.setForeground(Color.RED);
+            errorArea.setBackground(Color.BLACK);
             terminalPanel.add(errorArea, BorderLayout.CENTER);
         }
         
@@ -392,28 +425,28 @@ public class ToDoWidgetApp extends JFrame {
         langCombo.setToolTipText("Escolha a linguagem para destaque de sintaxe");
         bottomBar.add(langCombo, BorderLayout.EAST);
 
+        // Armazenar referência do combo para uso posterior
+        final JComboBox<String> finalLangCombo = langCombo;
+
         langCombo.addActionListener(e -> {
             RSyntaxTextArea area = getCurrentTextArea();
             String lang = (String) langCombo.getSelectedItem();
             String syntax = getSyntaxStyle(lang.toLowerCase());
             area.setSyntaxEditingStyle(syntax);
-            // Atualiza autocompletar
-            for (MouseWheelListener mwl : area.getMouseWheelListeners()) {
-                area.removeMouseWheelListener(mwl);
-            }
+            
+            // Atualiza autocompletar para nova linguagem
             CompletionProvider provider = createCompletionProvider(syntax);
             AutoCompletion ac = new AutoCompletion(provider);
             ac.install(area);
-            // Reinstala zoom
-            area.addMouseWheelListener(ev -> {
-                if (ev.isControlDown()) {
-                    int notches = ev.getWheelRotation();
-                    Font f = area.getFont();
-                    int newSize = Math.max(8, f.getSize() - notches);
-                    area.setFont(f.deriveFont((float)newSize));
-                    ev.consume();
-                }
-            });
+        });
+
+        // Listener para detectar mudança de aba e atualizar linguagem automaticamente
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedIndex() >= 0) {
+                String tabTitle = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
+                String detectedLang = detectLanguageFromTitle(tabTitle);
+                finalLangCombo.setSelectedItem(detectedLang);
+            }
         });
 
         mainPanel.add(bottomBar, BorderLayout.SOUTH);
@@ -445,8 +478,11 @@ public class ToDoWidgetApp extends JFrame {
                 saveCurrentTab();
             }
         });
+        
+        // Cria RTextScrollPane seguindo exemplo oficial da documentação
         RTextScrollPane sp = new RTextScrollPane(area);
         sp.setLineNumbersEnabled(true);
+        
         // Autocomplete básico
         CompletionProvider provider = createCompletionProvider(syntax);
         AutoCompletion ac = new AutoCompletion(provider);
@@ -472,30 +508,42 @@ public class ToDoWidgetApp extends JFrame {
         });
         tabPanel.add(closeBtn);
 
-        // Zoom de fonte com Ctrl + scroll
-        // Zoom de fonte com Ctrl + scroll
-        area.addMouseWheelListener(e -> {
+        // Configuração de zoom com Ctrl + scroll seguindo as melhores práticas
+        // O RTextScrollPane já tem scroll normal, só precisamos adicionar zoom
+        sp.addMouseWheelListener(e -> {
             if (e.isControlDown()) {
-                int notches = e.getWheelRotation();
-                Font f = area.getFont();
-                int newSize = Math.max(8, f.getSize() - notches);
-                float newSize_f = (float)newSize;
+                // Implementa zoom com Ctrl + scroll
+                int rotation = e.getWheelRotation();
+                Font currentFont = area.getFont();
+                int currentSize = currentFont.getSize();
+                int newSize = Math.max(8, Math.min(72, currentSize - rotation));
                 
-                // Atualiza fonte da área de texto
-                area.setFont(f.deriveFont(newSize_f));
-                
-                // Atualiza fonte da numeração de linhas
-                RTextScrollPane scrollPane = (RTextScrollPane)area.getParent().getParent();
-                Font gutterFont = new Font(f.getFamily(), Font.PLAIN, newSize);
-                scrollPane.getGutter().setLineNumberFont(gutterFont);
-                
-                e.consume();
+                if (newSize != currentSize) {
+                    Font newFont = currentFont.deriveFont((float)newSize);
+                    area.setFont(newFont);
+                    
+                    // Atualiza fonte dos números de linha
+                    Font gutterFont = new Font(newFont.getFamily(), Font.PLAIN, newSize);
+                    sp.getGutter().setLineNumberFont(gutterFont);
+                }
+                e.consume(); // Consome evento apenas no zoom
             }
+            // Scroll normal é tratado automaticamente pelo RTextScrollPane
         });
-
+        
         tabbedPane.addTab(title, sp);
         tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, tabPanel);
         tabbedPane.setSelectedComponent(sp);
+        
+        // Atualizar combo de linguagem automaticamente após adicionar a aba
+        SwingUtilities.invokeLater(() -> {
+            // Trigger do listener de mudança de aba para atualizar a linguagem
+            if (tabbedPane.getChangeListeners().length > 0) {
+                for (javax.swing.event.ChangeListener listener : tabbedPane.getChangeListeners()) {
+                    listener.stateChanged(new javax.swing.event.ChangeEvent(tabbedPane));
+                }
+            }
+        });
     }
 
     // Retorna a área de texto da aba atual
@@ -580,17 +628,39 @@ public class ToDoWidgetApp extends JFrame {
         repaint();
     }
 
-    // Mapeia extensão para syntax highlighting
-    private String getSyntaxStyle(String ext) {
-        switch (ext) {
+    // Mapeia extensão OU nome da linguagem para syntax highlighting
+    private String getSyntaxStyle(String input) {
+        String normalized = input.toLowerCase();
+        switch (normalized) {
+            // Por extensão de arquivo
             case "java": return SyntaxConstants.SYNTAX_STYLE_JAVA;
             case "python": case "py": return SyntaxConstants.SYNTAX_STYLE_PYTHON;
             case "js": case "javascript": return SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
-            case "html": return SyntaxConstants.SYNTAX_STYLE_HTML;
-            case "xml": return SyntaxConstants.SYNTAX_STYLE_XML;
+            case "html": case "htm": return SyntaxConstants.SYNTAX_STYLE_HTML;
+            case "xml": case "xsl": case "xsd": return SyntaxConstants.SYNTAX_STYLE_XML;
             case "c": return SyntaxConstants.SYNTAX_STYLE_C;
-            case "cpp": case "c++": return SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
-            case "txt": case "texto": default: return SyntaxConstants.SYNTAX_STYLE_NONE;
+            case "cpp": case "c++": case "cc": case "cxx": return SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
+            // Por nome da linguagem (do combo)
+            case "texto": case "text": default: return SyntaxConstants.SYNTAX_STYLE_NONE;
+        }
+    }
+
+    // Detecta linguagem baseada no título/nome do arquivo para atualizar combo automaticamente
+    private String detectLanguageFromTitle(String title) {
+        if (title.equals("Novo arquivo")) {
+            return "Java"; // Padrão para arquivos novos
+        }
+        
+        String ext = getExtension(title).toLowerCase();
+        switch (ext) {
+            case "java": return "Java";
+            case "py": case "python": return "Python";
+            case "c": return "C";
+            case "cpp": case "cc": case "cxx": return "C++";
+            case "js": case "mjs": return "JavaScript";
+            case "html": case "htm": return "HTML";
+            case "xml": case "xsl": case "xsd": return "XML";
+            case "txt": case "text": default: return "Texto";
         }
     }
 
