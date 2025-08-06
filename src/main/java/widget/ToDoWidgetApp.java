@@ -51,7 +51,7 @@ public class ToDoWidgetApp extends JFrame {
     }
 
     public ToDoWidgetApp() {
-        super("Coffe");
+        super("Coffee");
         // setUndecorated(true); // Removido para exibir barra de navegação
         // setAlwaysOnTop(true); // Removido para exibir barra de navegação
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -117,7 +117,7 @@ public class ToDoWidgetApp extends JFrame {
         JMenu infoMenu = new JMenu("Informações");
         JMenuItem infoItem = new JMenuItem("Sobre o programa");
         infoItem.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: Coffe",
+                "Editor de texto avançado, multi-abas, com destaque de sintaxe, autocompletar, zoom, seleção de linguagem, temas claro/escuro.\n\nAutor: Cabral567\nVersão: 1.0\nJava 17+\nProjeto: Coffee",
                 "Informações", JOptionPane.INFORMATION_MESSAGE));
         infoMenu.add(infoItem);
         menuBar.add(infoMenu);
