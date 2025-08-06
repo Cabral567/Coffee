@@ -30,9 +30,46 @@ public class ToDoWidgetApp extends JFrame {
         listModel = new DefaultListModel<>();
         tasks.forEach(listModel::addElement);
 
-        // Barra superior estilo Notepad++
+        // Barra de menus estilo Notepad++
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setBackground(new Color(170, 220, 120));
+
+        JMenu fileMenu = new JMenu("Arquivo");
+        JMenuItem saveItem = new JMenuItem("Salvar");
+        saveItem.addActionListener(e -> TaskPersistence.saveTasks(getAllTasks()));
+        JMenuItem openItem = new JMenuItem("Abrir");
+        openItem.addActionListener(e -> JOptionPane.showMessageDialog(this, "Abrir não implementado (todas tarefas são carregadas automaticamente)", "Abrir", JOptionPane.INFORMATION_MESSAGE));
+        JMenuItem exitItem = new JMenuItem("Sair");
+        exitItem.addActionListener(e -> System.exit(0));
+        fileMenu.add(saveItem);
+        fileMenu.add(openItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitItem);
+        menuBar.add(fileMenu);
+
+        JMenu editMenu = new JMenu("Editar");
+        JMenuItem deleteItem = new JMenuItem("Apagar tarefa selecionada");
+        deleteItem.addActionListener(e -> {
+            int idx = taskList.getSelectedIndex();
+            if (idx >= 0) {
+                listModel.remove(idx);
+                TaskPersistence.saveTasks(getAllTasks());
+            }
+        });
+        editMenu.add(deleteItem);
+        menuBar.add(editMenu);
+
+        JMenu helpMenu = new JMenu("Ajuda");
+        JMenuItem aboutItem = new JMenuItem("Sobre");
+        aboutItem.addActionListener(e -> JOptionPane.showMessageDialog(this, "To-Do Widget estilo Notepad++\nFeito em Java\nPor Cabral567", "Sobre", JOptionPane.INFORMATION_MESSAGE));
+        helpMenu.add(aboutItem);
+        menuBar.add(helpMenu);
+
+        setJMenuBar(menuBar);
+
+        // Barra superior com botões
         JPanel topBar = new JPanel(new BorderLayout());
-        topBar.setBackground(new Color(170, 220, 120)); // verde claro
+        topBar.setBackground(new Color(170, 220, 120));
         topBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
         inputField = new JTextField();
@@ -41,14 +78,37 @@ public class ToDoWidgetApp extends JFrame {
         inputField.addActionListener(e -> addTask());
         topBar.add(inputField, BorderLayout.CENTER);
 
-        // Botão de adicionar com ícone
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        btnPanel.setBackground(new Color(170, 220, 120));
+
         JButton addBtn = new JButton(new ImageIcon("src/main/resources/add.png"));
         addBtn.setToolTipText("Adicionar tarefa");
-        addBtn.setBackground(new Color(170, 220, 120));
+        addBtn.setBackground(new Color(200, 240, 180));
         addBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
         addBtn.addActionListener(e -> addTask());
-        topBar.add(addBtn, BorderLayout.EAST);
+        btnPanel.add(addBtn);
 
+        JButton delBtn = new JButton("🗑");
+        delBtn.setToolTipText("Apagar tarefa selecionada");
+        delBtn.setBackground(new Color(200, 240, 180));
+        delBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        delBtn.addActionListener(e -> {
+            int idx = taskList.getSelectedIndex();
+            if (idx >= 0) {
+                listModel.remove(idx);
+                TaskPersistence.saveTasks(getAllTasks());
+            }
+        });
+        btnPanel.add(delBtn);
+
+        JButton saveBtn = new JButton("💾");
+        saveBtn.setToolTipText("Salvar tarefas");
+        saveBtn.setBackground(new Color(200, 240, 180));
+        saveBtn.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        saveBtn.addActionListener(e -> TaskPersistence.saveTasks(getAllTasks()));
+        btnPanel.add(saveBtn);
+
+        topBar.add(btnPanel, BorderLayout.EAST);
         add(topBar, BorderLayout.NORTH);
 
         // Lista de tarefas
