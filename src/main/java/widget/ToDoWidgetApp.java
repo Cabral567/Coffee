@@ -18,8 +18,8 @@ public class ToDoWidgetApp extends JFrame {
 
     public ToDoWidgetApp() {
         super("To-Do Widget");
-        setUndecorated(true);
-        setAlwaysOnTop(true);
+        // setUndecorated(true); // Removido para exibir barra de navegação
+        // setAlwaysOnTop(true); // Removido para exibir barra de navegação
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(300, 400);
         setLocationRelativeTo(null);
