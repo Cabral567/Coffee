@@ -51,13 +51,11 @@ public class ToDoWidgetApp extends JFrame {
     }
 
     public ToDoWidgetApp() {
-        super("Coffee");
-        // setUndecorated(true); // Removido para exibir barra de navegação
-        // setAlwaysOnTop(true); // Removido para exibir barra de navegação
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout());  // Remove padding para ficar mais parecido com Notepad++
+    super("Coffee");
+    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    setSize(800, 600);
+    setLocationRelativeTo(null);
+    setLayout(new BorderLayout());
 
         // Editor multi-abas com syntax highlighting
         tabbedPane = new JTabbedPane();
@@ -65,84 +63,7 @@ public class ToDoWidgetApp extends JFrame {
         fileChooser = new JFileChooser();
         addNewTab("Novo arquivo", "java");
 
-        // Barra de menus estilo Notepad++
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(Color.white);
-        menuBar.setBorder(BorderFactory.createEmptyBorder());
-        menuBar.setPreferredSize(new Dimension(0, 28));
 
-        JMenu fileMenu = new JMenu("Arquivo");
-        JMenuItem newItem = new JMenuItem("Nova aba");
-        newItem.addActionListener(e -> addNewTab("Novo arquivo", "java"));
-        JMenuItem openItem = new JMenuItem("Abrir...");
-        openItem.addActionListener(e -> {
-            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                String ext = getExtension(file.getName());
-                String syntax = getSyntaxStyle(ext);
-                try {
-                    String content = new String(java.nio.file.Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
-                    addNewTab(file.getName(), syntax, content);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Erro ao abrir arquivo", "Erro", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        JMenuItem saveItem = new JMenuItem("Salvar aba");
-        saveItem.addActionListener(e -> saveCurrentTab());
-        JMenuItem saveAsItem = new JMenuItem("Salvar aba como...");
-        saveAsItem.addActionListener(e -> saveCurrentTabAs());
-        JMenuItem exitItem = new JMenuItem("Sair");
-        exitItem.addActionListener(e -> System.exit(0));
-        fileMenu.add(newItem);
-        fileMenu.add(openItem);
-        fileMenu.add(saveItem);
-        fileMenu.add(saveAsItem);
-        fileMenu.addSeparator();
-        fileMenu.add(exitItem);
-        menuBar.add(fileMenu);
-
-        JMenu editMenu = new JMenu("Editar");
-        JMenuItem cutItem = new JMenuItem("Cortar");
-        cutItem.addActionListener(e -> getCurrentTextArea().cut());
-        JMenuItem copyItem = new JMenuItem("Copiar");
-        copyItem.addActionListener(e -> getCurrentTextArea().copy());
-        JMenuItem pasteItem = new JMenuItem("Colar");
-        pasteItem.addActionListener(e -> getCurrentTextArea().paste());
-        editMenu.add(cutItem);
-        editMenu.add(copyItem);
-        editMenu.add(pasteItem);
-        menuBar.add(editMenu);
-
-        JMenu infoMenu = new JMenu("Informações");
-        JMenuItem infoItem = new JMenuItem("Sobre o programa");
-        infoItem.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Coffee - Editor de Texto Super Leve e Rápido\n\n" +
-                "CARACTERÍSTICAS PRINCIPAIS:\n" +
-                "• Editor ultrarrápido e responsivo\n" +
-                "• Interface minimalista e eficiente\n" +
-                "• Baixo consumo de memória e CPU\n\n" +
-                "RECURSOS:\n" +
-                "• Syntax highlighting para 8+ linguagens\n" +
-                "• Sistema de abas multi-documento\n" +
-                "• Autocompletar inteligente\n" +
-                "• Zoom dinâmico (Ctrl + Scroll)\n" +
-                "• Terminal PowerShell integrado\n" +
-                "• Detecção automática de linguagem\n\n" +
-                "Desenvolvido para ser o editor mais leve e ágil,\n" +
-                "sem sacrificar funcionalidades essenciais.\n\n" +
-                "Autor: Cabral567 | Versão: 1.0 | Java 17+",
-                "Coffee - Editor Super Leve", JOptionPane.INFORMATION_MESSAGE));
-        infoMenu.add(infoItem);
-        menuBar.add(infoMenu);
-
-        JMenu helpMenu = new JMenu("Ajuda");
-        JMenuItem aboutItem = new JMenuItem("Sobre");
-        aboutItem.addActionListener(e -> JOptionPane.showMessageDialog(this, "Editor de texto estilo Notepad++\nFeito em Java\nPor Cabral567", "Sobre", JOptionPane.INFORMATION_MESSAGE));
-        helpMenu.add(aboutItem);
-        menuBar.add(helpMenu);
-
-        setJMenuBar(menuBar);
 
         // Painel principal para layout vertical
         JPanel mainPanel = new JPanel();
