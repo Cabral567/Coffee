@@ -18,6 +18,40 @@ Editor multi-abas ultrarrápido com terminal integrado, desenvolvido para ser o 
 3. Siga o assistente de instalação
 4. Coffee será configurado automaticamente com "Abrir com"
 
+### Linux - Instalador Automático
+**Pré-requisitos:** Java 17+ e Maven instalados
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/Cabral567/Coffee.git
+   cd Coffee
+   ```
+2. Execute o instalador:
+   ```bash
+   bash ../install.sh
+   ```
+3. O programa será instalado nos diretórios padrão Linux:
+   - `/opt/coffee` (aplicação)
+   - `/usr/local/bin/coffee` (atalho de execução)
+   - `/usr/share/applications/coffee.desktop` (menu de aplicativos)
+   - `/usr/share/icons/hicolor/256x256/apps/coffee.png` (ícone)
+   - `~/.local/share/coffee` (dados do usuário)
+   - `~/.config/coffee` (configurações do usuário)
+4. Para executar:
+   ```bash
+   coffee
+   ```
+5. Para abrir um arquivo diretamente:
+   ```bash
+   coffee caminho/para/arquivo.txt
+   ```
+
+**Desinstalação:**
+Após a instalação, para remover completamente o Coffee do sistema, execute:
+```bash
+coffee-remove
+```
+
 ### Execução Manual (JAR)
 **Pré-requisito:** Java 17+ instalado
 ```shell
