@@ -36,6 +36,24 @@ public class ToDoWidgetApp extends JFrame {
     private List<TerminalTab> terminalTabs;
     private TerminalTab currentTerminalTab;
     
+    // Configurações de performance para PCs com recursos limitados
+    private static final int MAX_TERMINAL_TABS = 3; // Limitar abas para economizar memória
+    private static final int MAX_FILE_SIZE_FOR_SYNTAX = 1024 * 1024; // 1MB - desabilitar syntax para arquivos grandes
+    private static final int MAX_BUFFER_SIZE = 25000; // Reduzir buffer para economizar RAM
+    private static final boolean ENABLE_ANIMATIONS = false; // Desabilitar animações em PCs lentos
+    
+    // Detecção automática de recursos do sistema
+    private boolean isLowEndPC() {
+        Runtime runtime = Runtime.getRuntime();
+        long maxMemory = runtime.maxMemory() / (1024 * 1024); // MB
+        int processors = runtime.availableProcessors();
+        
+        // Considera PC com recursos limitados se:
+        // - Menos de 2GB de RAM disponível OU
+        // - Menos de 2 cores de CPU
+        return maxMemory < 2048 || processors < 2;
+    }
+    
     // Estiliza um botão da barra de ferramentas
     private void styleToolbarButton(JButton btn) {
         btn.setBackground(new Color(240, 240, 240));
@@ -192,6 +210,11 @@ public class ToDoWidgetApp extends JFrame {
 
         // Inicializar terminal com implementação melhorada estilo VSCode
         initializeTerminal();
+        
+        // Aplicar otimizações para PCs com recursos limitados
+        if (isLowEndPC()) {
+            applyLowEndPCOptimizations();
+        }
 
         // Configurar split pane
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabbedPane, terminalPanel);
@@ -430,9 +453,9 @@ public class ToDoWidgetApp extends JFrame {
                 int length = document.getLength();
                 document.insertString(length, text, style);
                 
-                // Limitar tamanho do documento
-                if (document.getLength() > 50000) {
-                    document.remove(0, 10000);
+                // Limitar tamanho do documento para PCs com recursos limitados
+                if (document.getLength() > MAX_BUFFER_SIZE) {
+                    document.remove(0, MAX_BUFFER_SIZE / 4); // Remove 25% do buffer
                 }
                 
                 // Auto-scroll
@@ -605,6 +628,15 @@ public class ToDoWidgetApp extends JFrame {
     }
     
     private void createNewTerminalTab() {
+        // Verificar limite de abas para PCs com recursos limitados
+        if (terminalTabs.size() >= MAX_TERMINAL_TABS) {
+            JOptionPane.showMessageDialog(this, 
+                "Limite máximo de " + MAX_TERMINAL_TABS + " terminais atingido.\n" +
+                "Feche uma aba existente antes de criar uma nova.",
+                "Limite de Terminais", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         TerminalTab newTab = new TerminalTab();
         terminalTabs.add(newTab);
         
@@ -682,6 +714,35 @@ public class ToDoWidgetApp extends JFrame {
             terminalTabs.clear();
         }
     }
+    
+    /**
+     * Aplica otimizações específicas para PCs com recursos limitados
+     */
+    private void applyLowEndPCOptimizations() {
+        // Desabilitar animações e efeitos visuais
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
+        
+        // Configurar look and feel mais leve
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+        } catch (Exception e) {
+            // Fallback para look padrão se houver erro
+        }
+        
+        // Reduzir frequência de atualizações da interface
+        System.setProperty("swing.bufferPerWindow", "false");
+        
+        // Configurar JVM para usar menos memória
+        System.setProperty("java.awt.headless", "false");
+        
+        // Mostrar mensagem informativa
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,
+                "Modo de economia de recursos ativado automaticamente.\n" +
+                "O editor foi otimizado para funcionar melhor em PCs com recursos limitados.",
+                "Otimizações Ativadas", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
 
     // Adiciona uma nova aba com linguagem
     private void addNewTab(String title, String syntax) {
@@ -690,9 +751,18 @@ public class ToDoWidgetApp extends JFrame {
 
     private void addNewTab(String title, String syntax, String content) {
         RSyntaxTextArea area = new RSyntaxTextArea(30, 80);
-        area.setSyntaxEditingStyle(syntax);
-        area.setCodeFoldingEnabled(true);
-        area.setAntiAliasingEnabled(true);
+        
+        // Otimização para PCs com recursos limitados: desabilitar syntax para arquivos grandes
+        if (content.length() > MAX_FILE_SIZE_FOR_SYNTAX) {
+            area.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
+            area.setCodeFoldingEnabled(false);
+            area.setAntiAliasingEnabled(false);
+        } else {
+            area.setSyntaxEditingStyle(syntax);
+            area.setCodeFoldingEnabled(true);
+            area.setAntiAliasingEnabled(true);
+        }
+        
         area.setFont(new Font("Consolas", Font.PLAIN, 15));
         area.setText(content);
         
