@@ -110,38 +110,38 @@ java -Xmx2048m -Xms512m -XX:+UseG1GC -jar Coffee.jar
 
 | Editor | RAM Mínima | CPU Mínima | Tamanho | Inicialização | Multiplataforma |
 |--------|-------------|------------|---------|---------------|------------------|
-| **Coffee** | **512MB** | **1 core** | **~15MB** | **Instantânea** | **✅ Sim** |
-| VSCode | 1GB | 2 cores | ~200MB | 5-10s | ✅ Sim |
-| Sublime Text | 512MB | 1 core | ~50MB | 2-3s | ✅ Sim |
-| Notepad++ | 256MB | 1 core | ~5MB | Instantânea | ❌ Windows |
-| Atom | 1GB | 2 cores | ~150MB | 8-15s | ✅ Sim |
-| Brackets | 1GB | 2 cores | ~100MB | 5-8s | ✅ Sim |
+| **Coffee** | **512MB** | **1 core** | **~15MB** | **Instantânea** | **Sim** |
+| VSCode | 1GB | 2 cores | ~200MB | 5-10s | Sim |
+| Sublime Text | 512MB | 1 core | ~50MB | 2-3s | Sim |
+| Notepad++ | 256MB | 1 core | ~5MB | Instantânea | Windows |
+| Atom | 1GB | 2 cores | ~150MB | 8-15s | Sim |
+| Brackets | 1GB | 2 cores | ~100MB | 5-8s | Sim |
 
 ### Vantagens do Coffee para PCs com Recursos Limitados
 
-- **🟢 RAM**: 50% menos que VSCode, 70% menos que Atom
-- **🟢 CPU**: Funciona com processadores de baixo desempenho
-- **🟢 Tamanho**: 13x menor que VSCode, 10x menor que Atom
-- **🟢 Inicialização**: 5-10x mais rápido que editores baseados em Electron
-- **🟢 Dependências**: Apenas Java Runtime, sem Node.js ou Chromium
+- **RAM**: 50% menos que VSCode, 70% menos que Atom
+- **CPU**: Funciona com processadores de baixo desempenho
+- **Tamanho**: 13x menor que VSCode, 10x menor que Atom
+- **Inicialização**: 5-10x mais rápido que editores baseados em Electron
+- **Dependências**: Apenas Java Runtime, sem Node.js ou Chromium
 
 ### Otimizações Automáticas para PCs com Recursos Limitados
 
 O Coffee Editor detecta automaticamente quando está rodando em um PC com recursos limitados e aplica otimizações:
 
-#### **🔍 Detecção Automática:**
+#### **Detecção Automática:**
 - **RAM**: Detecta se há menos de 2GB disponível
 - **CPU**: Identifica sistemas com menos de 2 cores
 - **Performance**: Ajusta configurações em tempo real
 
-#### **⚡ Otimizações Aplicadas:**
+#### **Otimizações Aplicadas:**
 - **Syntax Highlighting**: Desabilitado para arquivos > 1MB
 - **Terminais**: Limite máximo de 3 abas simultâneas
 - **Buffer**: Reduzido para 25KB (economia de 50% de RAM)
 - **Animações**: Desabilitadas para melhor performance
 - **Look & Feel**: Usa tema nativo do sistema (mais leve)
 
-#### **📊 Resultados das Otimizações:**
+#### **Resultados das Otimizações:**
 - **Inicialização**: 2-3x mais rápido em PCs lentos
 - **Uso de RAM**: 30-40% menor em máquinas com recursos limitados
 - **Responsividade**: Interface permanece fluida mesmo em hardware antigo
