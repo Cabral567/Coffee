@@ -12,6 +12,13 @@ import javax.swing.KeyStroke;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rtextarea.*;
 import org.fife.ui.autocomplete.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * Interface principal do widget To-Do List.
@@ -23,6 +30,11 @@ public class ToDoWidgetApp extends JFrame {
     private JSplitPane splitPane; // Divisor entre editor e terminal
     private JPanel terminalPanel; // Painel do terminal
     private boolean isTerminalVisible = false; // Estado de visibilidade do terminal
+    
+    // Componentes do terminal
+    private JTabbedPane terminalTabbedPane;
+    private List<TerminalTab> terminalTabs;
+    private TerminalTab currentTerminalTab;
     
     // Estiliza um botão da barra de ferramentas
     private void styleToolbarButton(JButton btn) {
@@ -168,7 +180,7 @@ public class ToDoWidgetApp extends JFrame {
                 "• Sistema de abas multi-documento\n" +
                 "• Autocompletar inteligente\n" +
                 "• Zoom dinâmico (Ctrl + Scroll)\n" +
-                "• Terminal PowerShell integrado\n" +
+                "• Terminal integrado (PowerShell no Windows, Bash no Linux)\n" +
                 "• Detecção automática de linguagem\n\n" +
                 "Desenvolvido para ser o editor mais leve e ágil,\n" +
                 "sem sacrificar funcionalidades essenciais.\n\n" +
@@ -178,153 +190,9 @@ public class ToDoWidgetApp extends JFrame {
 
         mainPanel.add(topBar, BorderLayout.NORTH);
 
-        // Configuração do terminal seguindo melhores práticas da documentação Java
-        terminalPanel = new JPanel(new BorderLayout());
-        terminalPanel.setBackground(new Color(30, 30, 30));
-        
-        try {
-            // Configurar ProcessBuilder seguindo a documentação oficial
-            ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe", "-NoExit");
-            processBuilder.redirectErrorStream(true); // Merge stderr com stdout
-            processBuilder.directory(new File(System.getProperty("user.dir"))); // Working directory
-            
-            // Configurar environment se necessário
-            processBuilder.environment().put("TERM", "dumb"); // Terminal simples
-            
-            Process process = processBuilder.start();
-            
-            // Terminal display com JTextArea otimizado
-            JTextArea terminalArea = new JTextArea(20, 80);
-            terminalArea.setBackground(Color.BLACK);
-            terminalArea.setForeground(Color.WHITE);
-            terminalArea.setFont(new Font("Consolas", Font.PLAIN, 14));
-            terminalArea.setCaretColor(Color.WHITE);
-            terminalArea.setEditable(false);
-            terminalArea.setLineWrap(true);
-            terminalArea.setWrapStyleWord(true);
-            
-            // Stream readers seguindo melhores práticas de I/O
-            java.io.BufferedReader outputReader = new java.io.BufferedReader(
-                new java.io.InputStreamReader(process.getInputStream(), 
-                java.nio.charset.StandardCharsets.UTF_8)
-            );
-            java.io.BufferedWriter inputWriter = new java.io.BufferedWriter(
-                new java.io.OutputStreamWriter(process.getOutputStream(), 
-                java.nio.charset.StandardCharsets.UTF_8)
-            );
-            
-            // Controle de auto-scroll melhorado
-            final boolean[] autoScroll = {true};
-            
-            // Thread para ler output do processo (seguindo pattern de documentação)
-            Thread outputThread = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = outputReader.readLine()) != null) {
-                        final String finalLine = line + "\n";
-                        SwingUtilities.invokeLater(() -> {
-                            terminalArea.append(finalLine);
-                            
-                            // Limitar tamanho do buffer para performance
-                            if (terminalArea.getDocument().getLength() > 50000) {
-                                try {
-                                    terminalArea.getDocument().remove(0, 10000);
-                                } catch (Exception ignored) {}
-                            }
-                            
-                            // Auto-scroll inteligente
-                            if (autoScroll[0]) {
-                                terminalArea.setCaretPosition(terminalArea.getDocument().getLength());
-                            }
-                        });
-                    }
-                } catch (java.io.IOException ex) {
-                    SwingUtilities.invokeLater(() -> {
-                        terminalArea.append("Terminal desconectado: " + ex.getMessage() + "\n");
-                    });
-                }
-            });
-            outputThread.setDaemon(true);
-            outputThread.start();
-            
-            // Campo de entrada otimizado
-            JTextField inputField = new JTextField();
-            inputField.setBackground(Color.BLACK);
-            inputField.setForeground(Color.WHITE);
-            inputField.setCaretColor(Color.WHITE);
-            inputField.setFont(new Font("Consolas", Font.PLAIN, 14));
-            inputField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)
-            ));
-            
-            // Action listener para enviar comandos
-            inputField.addActionListener(e -> {
-                String command = inputField.getText();
-                if (!command.trim().isEmpty()) {
-                    try {
-                        inputWriter.write(command + "\r\n");
-                        inputWriter.flush();
-                        inputField.setText("");
-                    } catch (java.io.IOException ex) {
-                        SwingUtilities.invokeLater(() -> {
-                            terminalArea.append("Erro ao enviar comando: " + ex.getMessage() + "\n");
-                        });
-                    }
-                }
-            });
-            
-            // ScrollPane com configurações otimizadas
-            JScrollPane terminalScroll = new JScrollPane(terminalArea);
-            terminalScroll.setBackground(Color.BLACK);
-            terminalScroll.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            terminalScroll.getViewport().setBackground(Color.BLACK);
-            
-            // Configurações de scroll seguindo melhores práticas
-            terminalScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            terminalScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            terminalScroll.getVerticalScrollBar().setUnitIncrement(16);
-            terminalScroll.getHorizontalScrollBar().setUnitIncrement(16);
-            
-            // Caret policy otimizada
-            DefaultCaret caret = (DefaultCaret) terminalArea.getCaret();
-            caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-            
-            // Detector de scroll manual melhorado
-            terminalScroll.getVerticalScrollBar().addAdjustmentListener(e -> {
-                if (!e.getValueIsAdjusting()) {
-                    JScrollBar scrollBar = terminalScroll.getVerticalScrollBar();
-                    int extent = scrollBar.getModel().getExtent();
-                    int maximum = scrollBar.getMaximum();
-                    int value = scrollBar.getValue();
-                    autoScroll[0] = (value + extent) >= (maximum - 50); // Margem de 50px
-                }
-            });
-            
-            // Container do terminal
-            JPanel terminalContainer = new JPanel(new BorderLayout());
-            terminalContainer.add(terminalScroll, BorderLayout.CENTER);
-            terminalContainer.add(inputField, BorderLayout.SOUTH);
-            
-            terminalPanel.add(terminalContainer, BorderLayout.CENTER);
-            
-            // Cleanup quando a janela fechar
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    inputWriter.close();
-                    outputReader.close();
-                    process.destroyForcibly();
-                } catch (Exception ignored) {}
-            }));
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JTextArea errorArea = new JTextArea("Erro ao iniciar terminal: " + ex.getMessage());
-            errorArea.setForeground(Color.RED);
-            errorArea.setBackground(Color.BLACK);
-            terminalPanel.add(errorArea, BorderLayout.CENTER);
-        }
-        
+        // Inicializar terminal com implementação melhorada estilo VSCode
+        initializeTerminal();
+
         // Configurar split pane
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabbedPane, terminalPanel);
         splitPane.setResizeWeight(0.7); // 70% para o editor, 30% para o terminal
@@ -376,6 +244,443 @@ public class ToDoWidgetApp extends JFrame {
         getRootPane().setBorder(BorderFactory.createLineBorder(new Color(180,180,180), 1));
         mainPanel.setBackground(Color.white);
         setContentPane(mainPanel);
+        
+        // Cleanup ao fechar
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                shutdownTerminal();
+            }
+        });
+    }
+
+    /**
+     * Classe interna para representar uma aba do terminal
+     */
+    private static class TerminalTab {
+        private JTextPane textPane;
+        private JTextField inputField;
+        private Process process;
+        private BufferedWriter processInput;
+        private BufferedReader processOutput;
+        private ExecutorService executor;
+        private AtomicBoolean running;
+        private StyledDocument document;
+        private List<String> commandHistory;
+        private int historyIndex;
+        private String currentPrompt;
+        
+        public TerminalTab() {
+            this.commandHistory = new ArrayList<>();
+            this.historyIndex = -1;
+            this.currentPrompt = "$ ";
+            this.executor = Executors.newCachedThreadPool();
+            this.running = new AtomicBoolean(false);
+            initializeComponents();
+        }
+        
+        private void initializeComponents() {
+            // TextPane para output
+            textPane = new JTextPane();
+            document = textPane.getStyledDocument();
+            
+            // Configurar aparência
+            textPane.setBackground(new Color(30, 30, 30));
+            textPane.setForeground(Color.WHITE);
+            textPane.setFont(new Font("Consolas", Font.PLAIN, 14));
+            textPane.setCaretColor(Color.WHITE);
+            textPane.setEditable(false);
+            
+            // Campo de entrada
+            inputField = new JTextField();
+            inputField.setBackground(new Color(30, 30, 30));
+            inputField.setForeground(Color.WHITE);
+            inputField.setCaretColor(Color.WHITE);
+            inputField.setFont(new Font("Consolas", Font.PLAIN, 14));
+            inputField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            ));
+            
+            // Configurar atalhos de teclado
+            setupKeyboardShortcuts();
+            
+            // Configurar menu de contexto
+            setupContextMenu();
+        }
+        
+        private void setupKeyboardShortcuts() {
+            // Histórico de comandos com setas
+            inputField.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_UP) {
+                        e.consume();
+                        navigateHistory(-1);
+                    } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                        e.consume();
+                        navigateHistory(1);
+                    } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        e.consume();
+                        executeCommand();
+                    } else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                        e.consume();
+                        // Auto-complete de comandos (implementar depois)
+                    }
+                }
+            });
+        }
+        
+        private void setupContextMenu() {
+            JPopupMenu contextMenu = new JPopupMenu();
+            
+            JMenuItem copyItem = new JMenuItem("Copiar");
+            copyItem.addActionListener(e -> copySelectedText());
+            contextMenu.add(copyItem);
+            
+            JMenuItem pasteItem = new JMenuItem("Colar");
+            pasteItem.addActionListener(e -> pasteText());
+            contextMenu.add(pasteItem);
+            
+            JMenuItem clearItem = new JMenuItem("Limpar");
+            clearItem.addActionListener(e -> clearTerminal());
+            contextMenu.add(clearItem);
+            
+            JMenuItem newTabItem = new JMenuItem("Nova aba");
+            newTabItem.addActionListener(e -> createNewTerminalTab());
+            contextMenu.add(newTabItem);
+            
+            // Adicionar menu de contexto ao textPane
+            textPane.setComponentPopupMenu(contextMenu);
+            inputField.setComponentPopupMenu(contextMenu);
+        }
+        
+        private void navigateHistory(int direction) {
+            if (commandHistory.isEmpty()) return;
+            
+            if (direction < 0 && historyIndex < commandHistory.size() - 1) {
+                historyIndex++;
+            } else if (direction > 0 && historyIndex > 0) {
+                historyIndex--;
+            } else if (direction > 0 && historyIndex == 0) {
+                historyIndex = -1;
+                inputField.setText("");
+                return;
+            }
+            
+            if (historyIndex >= 0 && historyIndex < commandHistory.size()) {
+                inputField.setText(commandHistory.get(historyIndex));
+                inputField.setCaretPosition(inputField.getText().length());
+            }
+        }
+        
+        private void executeCommand() {
+            String command = inputField.getText().trim();
+            if (!command.isEmpty() && running.get()) {
+                try {
+                    // Adicionar ao histórico
+                    commandHistory.add(command);
+                    historyIndex = -1;
+                    
+                    // Mostrar comando no terminal
+                    appendText(command + "\n", Color.YELLOW);
+                    
+                    // Enviar para o processo
+                    processInput.write(command);
+                    processInput.newLine();
+                    processInput.flush();
+                    
+                    // Limpar campo de entrada
+                    inputField.setText("");
+                    
+                } catch (IOException e) {
+                    appendText("Erro ao enviar comando: " + e.getMessage() + "\n", Color.RED);
+                }
+            }
+        }
+        
+        private void copySelectedText() {
+            textPane.copy();
+        }
+        
+        private void pasteText() {
+            inputField.paste();
+        }
+        
+        private void clearTerminal() {
+            try {
+                document.remove(0, document.getLength());
+                appendText("Terminal limpo.\n", Color.CYAN);
+                appendText(currentPrompt, Color.WHITE);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        private void createNewTerminalTab() {
+            // Implementar criação de nova aba
+            appendText("Funcionalidade de nova aba será implementada.\n", Color.CYAN);
+        }
+        
+        public void appendText(String text, Color color) {
+            try {
+                javax.swing.text.Style style = document.addStyle("terminal", null);
+                StyleConstants.setForeground(style, color);
+                
+                int length = document.getLength();
+                document.insertString(length, text, style);
+                
+                // Limitar tamanho do documento
+                if (document.getLength() > 50000) {
+                    document.remove(0, 10000);
+                }
+                
+                // Auto-scroll
+                textPane.setCaretPosition(document.getLength());
+                
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        public void startProcess() {
+            try {
+                String os = System.getProperty("os.name").toLowerCase();
+                ProcessBuilder processBuilder;
+                
+                if (os.contains("win")) {
+                    processBuilder = new ProcessBuilder("powershell.exe", "-NoExit", "-Command", "-");
+                } else {
+                    processBuilder = new ProcessBuilder("bash");
+                }
+                
+                processBuilder.redirectErrorStream(true);
+                processBuilder.directory(new File(System.getProperty("user.dir")));
+                
+                if (!os.contains("win")) {
+                    processBuilder.environment().put("TERM", "dumb");
+                    processBuilder.environment().put("PS1", "$ ");
+                }
+                
+                process = processBuilder.start();
+                processInput = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8));
+                processOutput = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+                
+                running.set(true);
+                
+                // Mensagem inicial
+                appendText("Terminal iniciado - " + (os.contains("win") ? "PowerShell" : "Bash") + "\n", Color.GREEN);
+                appendText("Diretório: " + System.getProperty("user.dir") + "\n", Color.CYAN);
+                appendText(currentPrompt, Color.WHITE);
+                
+                // Thread de leitura
+                executor.submit(this::readProcessOutput);
+                
+            } catch (Exception e) {
+                appendText("Erro ao iniciar terminal: " + e.getMessage() + "\n", Color.RED);
+                e.printStackTrace();
+            }
+        }
+        
+        private void readProcessOutput() {
+            try {
+                char[] buffer = new char[1024];
+                int bytesRead;
+                
+                while (running.get() && (bytesRead = processOutput.read(buffer)) != -1) {
+                    final String output = new String(buffer, 0, bytesRead);
+                    SwingUtilities.invokeLater(() -> {
+                        String cleanOutput = filterAnsiCodes(output);
+                        appendText(cleanOutput, Color.WHITE);
+                    });
+                }
+            } catch (IOException e) {
+                if (running.get()) {
+                    SwingUtilities.invokeLater(() -> {
+                        appendText("Terminal desconectado: " + e.getMessage() + "\n", Color.RED);
+                    });
+                }
+            }
+        }
+        
+        private String filterAnsiCodes(String text) {
+            return text.replaceAll("\\x1B\\[[0-9;]*[a-zA-Z]", "")
+                       .replaceAll("\\x1B\\][0-9;]*;.*?\\x07", "")
+                       .replaceAll("\\x1B\\][0-9;]*;.*?\\x1B\\\\", "");
+        }
+        
+        public void shutdown() {
+            running.set(false);
+            
+            if (executor != null) {
+                executor.shutdown();
+            }
+            
+            if (processInput != null) {
+                try {
+                    processInput.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            if (processOutput != null) {
+                try {
+                    processOutput.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            if (process != null) {
+                process.destroyForcibly();
+            }
+        }
+        
+        public JTextPane getTextPane() { return textPane; }
+        public JTextField getInputField() { return inputField; }
+        public boolean isRunning() { return running.get(); }
+    }
+
+    /**
+     * Inicializa o terminal com implementação robusta estilo VSCode
+     */
+    private void initializeTerminal() {
+        terminalPanel = new JPanel(new BorderLayout());
+        terminalPanel.setBackground(new Color(30, 30, 30));
+        
+        // Inicializar sistema de abas do terminal
+        terminalTabs = new ArrayList<>();
+        terminalTabbedPane = new JTabbedPane();
+        terminalTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        terminalTabbedPane.setBackground(new Color(30, 30, 30));
+        terminalTabbedPane.setForeground(Color.WHITE);
+        
+        // Criar primeira aba do terminal
+        createNewTerminalTab();
+        
+        // Adicionar botões de controle
+        JPanel terminalControlPanel = createTerminalControlPanel();
+        
+        terminalPanel.add(terminalControlPanel, BorderLayout.NORTH);
+        terminalPanel.add(terminalTabbedPane, BorderLayout.CENTER);
+    }
+    
+    private JPanel createTerminalControlPanel() {
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+        controlPanel.setBackground(new Color(45, 45, 45));
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+        
+        // Botão nova aba
+        JButton newTabBtn = new JButton("+");
+        newTabBtn.setToolTipText("Nova aba do terminal");
+        newTabBtn.setPreferredSize(new Dimension(25, 20));
+        newTabBtn.setBackground(new Color(60, 60, 60));
+        newTabBtn.setForeground(Color.WHITE);
+        newTabBtn.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        newTabBtn.addActionListener(e -> createNewTerminalTab());
+        controlPanel.add(newTabBtn);
+        
+        // Botão fechar aba
+        JButton closeTabBtn = new JButton("×");
+        closeTabBtn.setToolTipText("Fechar aba atual");
+        closeTabBtn.setPreferredSize(new Dimension(25, 20));
+        closeTabBtn.setBackground(new Color(60, 60, 60));
+        closeTabBtn.setForeground(Color.WHITE);
+        closeTabBtn.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        closeTabBtn.addActionListener(e -> closeCurrentTerminalTab());
+        controlPanel.add(closeTabBtn);
+        
+        // Botão limpar
+        JButton clearBtn = new JButton("Limpar");
+        clearBtn.setToolTipText("Limpar terminal atual");
+        clearBtn.setPreferredSize(new Dimension(60, 20));
+        clearBtn.setBackground(new Color(60, 60, 60));
+        clearBtn.setForeground(Color.WHITE);
+        clearBtn.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        clearBtn.addActionListener(e -> clearCurrentTerminal());
+        controlPanel.add(clearBtn);
+        
+        return controlPanel;
+    }
+    
+    private void createNewTerminalTab() {
+        TerminalTab newTab = new TerminalTab();
+        terminalTabs.add(newTab);
+        
+        // Criar painel da aba
+        JPanel tabPanel = new JPanel(new BorderLayout());
+        tabPanel.setBackground(new Color(30, 30, 30));
+        
+        // Adicionar componentes
+        JScrollPane scrollPane = new JScrollPane(newTab.getTextPane());
+        scrollPane.setBackground(new Color(30, 30, 30));
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        scrollPane.getViewport().setBackground(new Color(30, 30, 30));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+        tabPanel.add(scrollPane, BorderLayout.CENTER);
+        tabPanel.add(newTab.getInputField(), BorderLayout.SOUTH);
+        
+        // Adicionar aba
+        String tabTitle = "Terminal " + terminalTabs.size();
+        terminalTabbedPane.addTab(tabTitle, tabPanel);
+        terminalTabbedPane.setSelectedComponent(tabPanel);
+        
+        // Definir como aba atual
+        currentTerminalTab = newTab;
+        
+        // Iniciar processo
+        newTab.startProcess();
+        
+        // Configurar listener para mudança de aba
+        terminalTabbedPane.addChangeListener(e -> {
+            int selectedIndex = terminalTabbedPane.getSelectedIndex();
+            if (selectedIndex >= 0 && selectedIndex < terminalTabs.size()) {
+                currentTerminalTab = terminalTabs.get(selectedIndex);
+            }
+        });
+    }
+    
+    private void closeCurrentTerminalTab() {
+        if (currentTerminalTab != null && terminalTabs.size() > 1) {
+            int currentIndex = terminalTabbedPane.getSelectedIndex();
+            if (currentIndex >= 0) {
+                // Desligar terminal
+                currentTerminalTab.shutdown();
+                
+                // Remover da lista
+                terminalTabs.remove(currentIndex);
+                
+                // Remover aba
+                terminalTabbedPane.removeTabAt(currentIndex);
+                
+                // Atualizar aba atual
+                if (!terminalTabs.isEmpty()) {
+                    currentTerminalTab = terminalTabs.get(Math.min(currentIndex, terminalTabs.size() - 1));
+                    terminalTabbedPane.setSelectedIndex(Math.min(currentIndex, terminalTabs.size() - 1));
+                }
+            }
+        }
+    }
+    
+    private void clearCurrentTerminal() {
+        if (currentTerminalTab != null) {
+            currentTerminalTab.clearTerminal();
+        }
+    }
+    
+    /**
+     * Desliga o terminal e limpa recursos
+     */
+    private void shutdownTerminal() {
+        if (terminalTabs != null) {
+            for (TerminalTab tab : terminalTabs) {
+                tab.shutdown();
+            }
+            terminalTabs.clear();
+        }
     }
 
     // Adiciona uma nova aba com linguagem
